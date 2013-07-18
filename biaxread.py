@@ -90,48 +90,59 @@ def ReadBin(f_name):
     col_recs     = []
     col_units    = []
     
+    # Unpack information at the top of the file about the experiment
     name = struct.unpack('20c',f.read(20))
     name = ''.join(str(i) for i in name)
     name = name.split("\0")[0]
     print "\nName: ",name
     
-    num_recs = struct.unpack('>I',f.read(4))
+    # The rest of the header information is written in big endian format
+    
+    # Number of records (int)
+    num_recs = struct.unpack('>i',f.read(4))
     num_recs = int(num_recs[0])
     print "Number of records: %d" %num_recs
     
-    num_cols =  struct.unpack('>I',f.read(4))
+    # Number of columns (int)
+    num_cols =  struct.unpack('>i',f.read(4))
     num_cols = int(num_cols[0])
     print "Number of columns: %d" %num_cols
     
-    swp =  struct.unpack('>I',f.read(4))[0]
+    # Sweet (int) - No longer used
+    swp =  struct.unpack('>i',f.read(4))[0]
     print "Swp: ",swp
     
-    dtime =  struct.unpack('>I',f.read(4))[0]
+    # Date/time(int) - No longer used
+    dtime =  struct.unpack('>i',f.read(4))[0]
     print "dtime: ",dtime
     
-    
+    # For each possible column (32 maximum columns) unpack its header
+    # information and store it.  Only store column headers of columns
+    # that contain data.  Use termination at first NUL.
     for i in range(32):
+    
+        # Channel name (13 characters)
         chname = struct.unpack('13c',f.read(13))
         chname = ''.join(str(i) for i in chname)
         chname = chname.split("\0")[0] 
         
+        # Channel units (13 characters)
         chunits = struct.unpack('13c',f.read(13))
         chunits = ''.join(str(i) for i in chunits)
         chunits = chunits.split("\0")[0]
     
+        # This field is now unused, so we just read past it (int)
+        gain = struct.unpack('>i',f.read(4))
         
-        gain = struct.unpack('>I',f.read(4))
-    
-        
+        # This field is now unused, so we just read past it (50 characters)
         comment = struct.unpack('50c',f.read(50))
-        comment = ''.join(str(i) for i in comment)
-    
-    
-        nelem = struct.unpack('>I',f.read(4))
+
+        # Number of elements (int)
+        nelem = struct.unpack('>i',f.read(4))
         nelem = int(nelem[0])
         
         if chname[0:6] == 'no_val':
-            continue
+            continue # Skip Blank Channels
         else:
             col_headings.append(chname)
             col_recs.append(nelem)
@@ -148,7 +159,6 @@ def ReadBin(f_name):
     
     # Read the data into a numpy recarray
     dtype=[]
-    #dtype.append(('row_num','float'))
     for name in col_headings:
         dtype.append((name,'float'))
     dtype = np.dtype(dtype)
