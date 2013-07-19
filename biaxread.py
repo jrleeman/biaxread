@@ -1,16 +1,17 @@
 import numpy as np
-import sys
 import struct
 
-def ReadAscii(f_name):
+def ReadAscii(filename):
     """
     Takes a filename containing the text output (with headers) from xlook and
     reads the columns into a rec array for easy data processing and access.
     """
 
-    filename = f_name
-
-    f = open(filename,'r')
+    try:
+        f = open(filename,'r')
+    except:
+        print "Error Opening %s" %filename
+        return 0
     
     col_width = 12 # Columns are 12 char wide in header
     
@@ -76,15 +77,22 @@ def ReadAscii(f_name):
     
     return data_rec
 
-def ReadBin(f_name):
+def ReadBin(filename,dataendianness='little'):
     """
     Takes a filename containing the binary output from xlook and
     reads the columns into a rec array for easy data processing and access.
-    """
     
-    filename = f_name
+    The data section of the file is written in the native format of the machine
+    used to produce the file.  Endianness of data is little by default, but may
+    be changed to 'big' to accomodate older files or files written on power pc 
+    chips.
+    """
 
-    f = open(filename,'rb')
+    try:
+        f = open(filename,'rb')
+    except:
+        print "Error Opening %s" %filename
+        return 0
     
     col_headings = []
     col_recs     = []
@@ -108,7 +116,7 @@ def ReadBin(f_name):
     num_cols = int(num_cols[0])
     print "Number of columns: %d" %num_cols
     
-    # Sweet (int) - No longer used
+    # Sweep (int) - No longer used
     swp =  struct.unpack('>i',f.read(4))[0]
     print "Swp: ",swp
     
@@ -167,7 +175,13 @@ def ReadBin(f_name):
     
     for col in range(num_cols):
         for row in range(col_recs[col]):
-            data[row,col] = struct.unpack('<d',f.read(8))[0]
+            if dataendianness == 'little':
+                data[row,col] = struct.unpack('<d',f.read(8))[0]
+            elif dataendianness == 'big':
+                data[row,col] = struct.unpack('>d',f.read(8))[0]
+            else:
+                print "Data endian setting invalid, please check and retry"
+                return 0
 
     data_rec = np.rec.array(data,dtype=dtype)
     
