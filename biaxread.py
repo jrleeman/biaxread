@@ -168,7 +168,7 @@ def ReadBin(filename,dataendianness='little'):
     # Read the data into a numpy recarray
     dtype=[]
     for name in col_headings:
-        dtype.append((name,'float'))
+        dtype.append((name,'double'))
     dtype = np.dtype(dtype)
     
     data = np.zeros([num_recs,num_cols])
