@@ -97,6 +97,8 @@ For each possible column there are 84 bytes of information.  There are 32 possib
 
 Data is stored as the default machine format, which for modern Intel based computers in little-endian.  This is the default for the module, but big-endian can be specified.  Each column is written out as a sequence of doubles that are $n_elem$ long.  Doubles are read and stored in a numpy array.  The array is then combined with datatype information collected from the headers and stored as a rec array.
 
+To find the default machine binay format run: \emph{python -c "import struct; print 'little' if ord(struct.pack('L', 1)[0]) else 'big'"}
+
 A new set of improvements would be to add a cutting tool or a way to interface the script with the Pandas data handling library.
 
 \section{Cautions}
