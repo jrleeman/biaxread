@@ -5,7 +5,8 @@ import pandas as pd
 def ReadAscii(filename,pandas=False):
     """
     Takes a filename containing the text output (with headers) from xlook and
-    reads the columns into a rec array for easy data processing and access.
+    reads the columns into a rec array or dataframe object for easy data 
+    processing and access.
     """
 
     try:
@@ -90,7 +91,8 @@ def ReadAscii(filename,pandas=False):
 def ReadBin(filename,dataendianness='little',pandas=False):
     """
     Takes a filename containing the binary output from xlook and
-    reads the columns into a rec array for easy data processing and access.
+    reads the columns into a rec array or dataframe object for easy 
+    data processing and access.
     
     The data section of the file is written in the native format of the machine
     used to produce the file.  Endianness of data is little by default, but may
