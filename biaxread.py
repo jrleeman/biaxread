@@ -201,13 +201,12 @@ def ReadBin(filename,dataendianness='little',pandas=False):
         # If a pandas object is requested, make a data frame 
         # indexed on row number and return it
         dfo  = pd.DataFrame(data,columns=col_headings)
-        dfo = dfo.set_index('row_num') 
+        # Binary didn't give us a row number, so we just let
+        # pandas do that and name the index column
+        dfo.index.name = 'row_num' 
         return dfo
         
     else:  
         # Otherwise return the default (Numpy Recarray)  
         data_rec = np.rec.array(data,dtype=dtype)
         return data_rec
-    
-#data = ReadAscii('p4251_data.txt',pandas=False)
-data = ReadBin('p4115_data',pandas=False)
