@@ -2,7 +2,7 @@ import numpy as np
 import struct
 import pandas as pd
 
-def ReadAscii(filename):
+def ReadAscii(filename,pandas=False):
     """
     Takes a filename containing the text output (with headers) from xlook and
     reads the columns into a rec array for easy data processing and access.
@@ -30,7 +30,7 @@ def ReadAscii(filename):
     # Third line is the column headings
     col_headings_str = f.readline()
     col_headings_str = col_headings_str[5:-1]
-    col_headings = []
+    col_headings = ['row_num'] # Row number the the first (unlabeled) column
     for i in xrange(len(col_headings_str)/12):
         heading = col_headings_str[12*i:12*i+12].strip()
         col_headings.append(heading)
@@ -59,7 +59,7 @@ def ReadAscii(filename):
     
     # Read the data into a numpy recarray
     dtype=[]
-    dtype.append(('row_num','float'))
+    #dtype.append(('row_num','float'))
     for name in col_headings:
         dtype.append((name,'float'))
     dtype = np.dtype(dtype)
@@ -72,13 +72,22 @@ def ReadAscii(filename):
         for j in xrange(num_cols):
             data[i,j] = row_data[j]
         i+=1
-    data_rec = np.rec.array(data,dtype=dtype)
-    
+
     f.close()
     
-    return data_rec
+    if pandas==True: 
+        # If a pandas object is requested, make a data frame 
+        # indexed on row number and return it
+        dfo  = pd.DataFrame(data,columns=col_headings)
+        dfo = dfo.set_index('row_num') 
+        return dfo
+        
+    else:  
+        # Otherwise return the default (Numpy Recarray)  
+        data_rec = np.rec.array(data,dtype=dtype)
+        return data_rec
 
-def ReadBin(filename,dataendianness='little'):
+def ReadBin(filename,dataendianness='little',pandas=False):
     """
     Takes a filename containing the binary output from xlook and
     reads the columns into a rec array for easy data processing and access.
@@ -188,4 +197,17 @@ def ReadBin(filename,dataendianness='little'):
     
     f.close()
     
-    return data_rec
+    if pandas==True: 
+        # If a pandas object is requested, make a data frame 
+        # indexed on row number and return it
+        dfo  = pd.DataFrame(data,columns=col_headings)
+        dfo = dfo.set_index('row_num') 
+        return dfo
+        
+    else:  
+        # Otherwise return the default (Numpy Recarray)  
+        data_rec = np.rec.array(data,dtype=dtype)
+        return data_rec
+    
+#data = ReadAscii('p4251_data.txt',pandas=False)
+data = ReadBin('p4115_data',pandas=False)
