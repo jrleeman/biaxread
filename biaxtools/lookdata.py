@@ -32,14 +32,14 @@ def read_ascii(filename,pandas=False):
     col_headings_str = f.readline()
     col_headings_str = col_headings_str[5:-1]
     col_headings = ['row_num'] # Row number the the first (unlabeled) column
-    for i in xrange(len(col_headings_str)/12):
+    for i in range(len(col_headings_str)/12):
         heading = col_headings_str[12*i:12*i+12].strip()
         col_headings.append(heading)
 
     # Fourth line is column units
     col_units_str = f.readline()
     col_units_str = col_units_str[5:-1]
-    col_units=[]
+    col_units=['.']
     for i in xrange(len(col_units_str)/12):
         heading = col_units_str[12*i:12*i+12].strip()
         col_units.append(heading)
@@ -49,6 +49,7 @@ def read_ascii(filename,pandas=False):
     col_recs = f.readline()
     col_recs = col_recs.split('recs')
     col_recs = [int(x) for x in col_recs if x != '\n']
+    col_recs.insert(0, num_recs)
 
     # Show column units and headings
     print "\n\n-------------------------------------------------"
